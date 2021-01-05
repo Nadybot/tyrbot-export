@@ -1,13 +1,14 @@
-from core.decorators import instance, command
-from core.registry import Registry
-from core.command_request import CommandRequest
-from core.aochat.bot import Bot
-from core.db import DB
-from core.command_param_types import Any
-from core.lookup.character_service import CharacterService
 import json
 import os
-from typing import List, Dict, Union, Optional
+from typing import Dict, List, Optional, Union
+
+from core.aochat.bot import Bot
+from core.command_param_types import Any
+from core.command_request import CommandRequest
+from core.db import DB
+from core.decorators import command, instance
+from core.lookup.character_service import CharacterService
+from core.registry import Registry
 
 ALT_MAIN = 2
 ALT_CONFIRMED = 1
