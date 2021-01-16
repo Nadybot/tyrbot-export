@@ -1,0 +1,6 @@
+name = "tyrbot-export"
+description = "Export Tyrbots in the AO Export Format"
+version = "0.1.1"
+author = "Yakachi"
+bot_type = "Tyrbot"
+bot_version = "^0.0.1"

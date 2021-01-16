@@ -139,6 +139,8 @@ class ExportController:
             rank = self.convert_rank(member["char_id"], member["access_level"])
             if rank is not None:
                 entry["rank"] = rank
+            else:
+                continue
 
             if member["logon"]:
                 entry["logonMessage"] = member["logon"]
@@ -212,16 +214,27 @@ class ExportController:
                 "startTime": poll["created_at"],
                 "endTime": poll["finished_at"],
                 "minRankToVote": poll["min_access_level"],
-                "answers": {},
+                "answers": [],
             }
             for choice in choices:
                 voters = self.db.query(
                     'SELECT *, (SELECT "name" FROM player WHERE "char_id"=p."char_id") AS "char_name" FROM poll_vote p WHERE "poll_id"=? AND "choice_id"=?;',
                     [poll["id"], choice["id"]],
                 )
-                entry["answers"][choice["choice"]] = [
-                    {"id": c["char_id"], "name": c["char_name"]} for c in voters
-                ]
+                entry["answers"].append(
+                    {
+                        "answer": choice["choice"],
+                        "votes": [
+                            {
+                                "character": {
+                                    "id": c["char_id"],
+                                    "name": c["char_name"],
+                                }
+                            }
+                            for c in voters
+                        ],
+                    }
+                )
             polls.append(entry)
 
         return polls
@@ -289,7 +302,13 @@ class ExportController:
                     "id": timer["char_id"],
                     "name": timer["char_name"],
                 },
-                "channels": [timer["channel"]],
+                "channels": [timer["channel"] if timer["channel"] != "msg" else "tell"],
+                "alerts": [
+                    {
+                        "time": timer["finished_at"],
+                        "message": f"Timer <highlight>{timer['name']}<end> has gone off.",
+                    }
+                ],
             }
             if timer["repeating_every"]:
                 entry["repeatInterval"] = timer["repeating_every"]
